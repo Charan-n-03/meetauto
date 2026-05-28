@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  :root{--bg:#0c0e12;--bg2:#13161c;--card:#191d26;--bdr:#252a36;--fg:#e4e7ec;--fg2:#8b93a7;--fg3:#4a5168;--ac:#00e09e;--acg:rgba(0,224,158,.12);--wn:#ffa940;--wng:rgba(255,169,64,.12);--dn:#ff5a5a;--dng:rgba(255,90,90,.12);--inf:#5b9aff;--r:8px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--fg);width:420px;max-height:580px;overflow:hidden}
+  .app{display:flex;flex-direction:column;height:100%}
+  .sprites{position:absolute;width:0;height:0;overflow:hidden}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+  .logo{display:flex;align-items:center;gap:9px}
+  .logo svg{width:28px;height:28px}
+  .logo h1{font-size:16px;font-weight:700;letter-spacing:-.3px}
+  .logo span{font-size:9px;color:var(--fg3);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-top:1px}
+  .clock{font-family:'SF Mono',Consolas,monospace;font-size:20px;font-weight:700;letter-spacing:1.5px}
+  .clock .s{color:var(--ac)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 18px;flex-shrink:0}
+  .st{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:10px 12px;display:flex;align-items:center;gap:10px}
+  .st-ic{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .st-ic.g{background:var(--acg);color:var(--ac)}.st-ic.o{background:var(--wng);color:var(--wn)}.st-ic.b{background:rgba(91,154,255,.1);color:var(--inf)}
+  .st-ic svg{width:13px;height:13px}
+  .st-v{font-size:18px;font-weight:700;font-family:'SF Mono',Consolas,monospace}
+  .st-l{font-size:9px;color:var(--fg3);margin-top:1px}
+  .tabs{display:flex;padding:0 18px;gap:4px;flex-shrink:0;border-bottom:1px solid var(--bdr)}
+  .tab{padding:9px 16px;font-size:12px;font-weight:600;color:var(--fg3);cursor:pointer;border:none;background:none;font-family:inherit;border-bottom:2px solid transparent;transition:.2s}
+  .tab:hover{color:var(--fg2)}.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+  .body{flex:1;overflow-y:auto;padding:12px 18px 16px}
+  .body::-webkit-scrollbar{width:4px}.body::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+  .mc{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;transition:.2s}
+  .mc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac);opacity:0;transition:.2s}
+  .mc:hover{border-color:rgba(0,224,158,.2)}.mc:hover::before{opacity:1}
+  .mc.joined{opacity:.4}.mc.joined::before{background:var(--fg3);opacity:1}
+  .mc.soon{border-color:var(--wn);animation:pb 2s infinite}.mc.soon::before{background:var(--wn);opacity:1}
+  @keyframes pb{0%,100%{box-shadow:0 0 0 0 var(--wng)}50%{box-shadow:0 0 0 4px var(--wng)}}
+  .mc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .mc-code{font-family:'SF Mono',Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.5px}
+  .mc-meta{display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap}
+  .mc-mi{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--fg2)}
+  .mc-mi svg{width:10px;height:10px;opacity:.6}
+  .mc-url{font-family:'SF Mono',Consolas,monospace;font-size:9px;color:var(--ac);opacity:.5;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mc-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+  .tag{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:10px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .tag-off{background:var(--dng);color:var(--dn)}.tag-r{background:rgba(91,154,255,.1);color:var(--inf)}
+  .tag-n{background:rgba(255,255,255,.03);color:var(--fg3)}
+  .mc-bot{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+  .cd{font-family:'SF Mono',Consolas,monospace;font-size:15px;font-weight:700;color:var(--ac)}
+  .cd.soon{color:var(--wn)}.cd.past{color:var(--fg3);font-size:11px}
+  .cd-label{font-size:8px;color:var(--fg3);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+  .mc-acts{display:flex;gap:4px}
+  .jb{position:absolute;top:8px;right:8px;padding:2px 7px;border-radius:10px;background:var(--acg);color:var(--ac);font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+  .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:none}
+  .btn-p{background:var(--ac);color:#000}.btn-p:hover{filter:brightness(.9)}
+  .btn-g{background:transparent;color:var(--fg2);border:1px solid var(--bdr)}.btn-g:hover{border-color:var(--fg3);color:var(--fg)}
+  .btn-d{background:var(--dng);color:var(--dn)}.btn-d:hover{background:rgba(255,90,90,.2)}
+  .btn-sm{padding:5px 8px}.btn-sm svg{width:11px;height:11px}
+  .add-btn{width:100%;padding:10px;margin-top:4px;font-size:12px;justify-content:center}
+  .add-btn svg{width:13px;height:13px}
+  .empty{text-align:center;padding:40px 10px;color:var(--fg2)}
+  .empty svg{width:36px;height:36px;opacity:.2;margin-bottom:10px}
+  .empty h3{font-size:14px;font-weight:600;color:var(--fg);margin-bottom:4px}
+  .empty p{font-size:11px;line-height:1.5}
+  .sb{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+  .sb h4{font-size:12px;font-weight:700;margin-bottom:2px}
+  .sb>p{font-size:10px;color:var(--fg2);margin-bottom:12px}
+  .sr{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--bdr);gap:8px}
+  .sr:first-of-type{border-top:none}
+  .sr-l{font-size:11px}.sr-d{font-size:9px;color:var(--fg3);margin-top:1px}
+  .fi{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--bdr);border-radius:6px;color:var(--fg);font-family:inherit;font-size:12px;outline:none;transition:.2s}
+  .fi:focus{border-color:var(--ac);box-shadow:0 0 0 2px var(--acg)}
+  .fi::placeholder{color:var(--fg3)}
+  .fs{padding:8px 10px;background:var(--bg);border:1px solid var(--bdr);border-radius:6px;color:var(--fg);font-family:inherit;font-size:11px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%234a5168' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+  .fs option{background:var(--card);color:var(--fg)}
+  .tg{width:36px;height:20px;border-radius:10px;background:var(--bdr);cursor:pointer;position:relative;transition:.2s;border:none;flex-shrink:0}
+  .tg::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--fg3);transition:.2s}
+  .tg.on{background:var(--ac)}.tg.on::after{left:19px;background:#fff}
+  .save-btn{width:100%;padding:10px;margin-top:6px;font-size:12px;justify-content:center}
+  .mo{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:.2s}
+  .mo.on{opacity:1;visibility:visible}
+  .md{background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:20px;width:380px;max-height:520px;overflow-y:auto;transform:scale(.97);transition:.2s}
+  .mo.on .md{transform:scale(1)}
+  .md-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .md-h h3{font-size:15px;font-weight:700}
+  .md-x{width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--bdr);color:var(--fg3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;font-size:12px}
+  .md-x:hover{background:var(--dng);color:var(--dn);border-color:var(--dn)}
+  .fg{margin-bottom:14px}
+  .fl{display:block;font-size:10px;font-weight:700;color:var(--fg2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px}
+  .fh{font-size:9px;color:var(--fg3);margin-top:3px}
+  .fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .fa{display:flex;gap:6px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr)}
+  .tg-row{display:flex;gap:14px}
+  .tg-g{display:flex;align-items:center;gap:6px}
+  .tg-l{font-size:11px;color:var(--fg2);display:flex;align-items:center;gap:3px}
+  .tg-l svg{width:11px;height:11px}
+  .tc{position:fixed;top:8px;right:8px;z-index:100;display:flex;flex-direction:column;gap:6px}
+  .toast{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r);background:var(--bg2);border:1px solid var(--bdr);box-shadow:0 4px 20px rgba(0,0,0,.4);font-size:11px;animation:ti .3s ease;max-width:300px}
+  .toast.out{animation:to .2s ease forwards}
+  .t-ic{width:14px;height:14px;flex-shrink:0}
+  .t-ic.ok{color:var(--ac)}.t-ic.wn{color:var(--wn)}.t-ic.er{color:var(--dn)}.t-ic.in{color:var(--inf)}
+  .t-cl{margin-left:auto;background:none;border:none;color:var(--fg3);cursor:pointer;font-size:10px;padding:2px}
+  @keyframes ti{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes to{to{opacity:0;transform:translateX(20px)}}
+  .cf .md{width:320px;text-align:center}
+  .cf-ic{color:var(--dn);margin-bottom:10px}.cf-ic svg{width:32px;height:32px}
+  .cf-t{font-size:14px;font-weight:700;margin-bottom:4px}
+  .cf-p{font-size:11px;color:var(--fg2);margin-bottom:16px;line-height:1.5}
+  .cf-acts{display:flex;gap:6px;justify-content:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <svg class="sprites" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-bolt" viewBox="0 0 24 24" fill="none"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="currentColor"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-camoff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1l22 22"/><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="i-micoff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1l22 22"/><path d="M9 9v3a3 3 0 005.12 2.12M15 9.34V4a3 3 0 00-5.94-.6"/><path d="M17 16.95A7 7 0 015 12v-2m14 0v2c0 .76-.13 1.49-.35 2.18"/><line x1="12" y1="19" x2="12" y2="23"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></symbol>
+    <symbol id="i-join" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  </svg>
+
+  <header>
+    <div class="logo">
+      <svg style="color:var(--ac);filter:drop-shadow(0 0 8px var(--acg))"><use href="#i-bolt"/></svg>
+      <div><h1>MeetAuto</h1><span>Silent Join</span></div>
+    </div>
+    <div class="clock" id="clk">00:00<span class="s">:00</span></div>
+  </header>
+
+  <div class="stats">
+    <div class="st"><div class="st-ic g"><svg><use href="#i-clock"/></svg></div><div><div class="st-v" id="sUp">0</div><div class="st-l">Upcoming</div></div></div>
+    <div class="st"><div class="st-ic o"><svg><use href="#i-cal"/></svg></div><div><div class="st-v" id="sTd">0</div><div class="st-l">Today</div></div></div>
+    <div class="st"><div class="st-ic b"><svg><use href="#i-check"/></svg></div><div><div class="st-v" id="sJn">0</div><div class="st-l">Joined</div></div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-t="meets">Meetings</button>
+    <button class="tab" data-t="settings">Settings</button>
+  </div>
+
+  <div class="body" id="body"></div>
+
+  <!-- Add/Edit Modal -->
+  <div class="mo" id="moAdd">
+    <div class="md">
+      <div class="md-h"><h3 id="moTitle">Schedule Meet</h3><button class="md-x" data-close="moAdd"><svg width="12" height="12"><use href="#i-close"/></svg></button></div>
+      <form id="mForm">
+        <input type="hidden" id="fId">
+        <div class="fg"><label class="fl">Google Meet Link</label><input type="url" class="fi" id="fLink" placeholder="https://meet.google.com/abc-defg-hij" required><div class="fh">Paste the full Meet URL</div></div>
+        <div class="fr">
+          <div class="fg"><label class="fl">Date</label><input type="date" class="fi" id="fDate" required></div>
+          <div class="fg"><label class="fl">Time</label><input type="time" class="fi" id="fTime" required></div>
+        </div>
+        <div class="fg"><label class="fl">Repeat</label><select class="fs" id="fRepeat"><option value="none">No Repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="weekday">Weekdays (Mon-Fri)</option></select></div>
+        <div class="fg">
+          <label class="fl">Join Settings</label>
+          <div class="tg-row">
+            <div class="tg-g"><span class="tg-l"><svg><use href="#i-camoff"/></svg>Cam Off</span><button type="button" class="tg on" id="fCam"></button></div>
+            <div class="tg-g"><span class="tg-l"><svg><use href="#i-micoff"/></svg>Mic Off</span><button type="button" class="tg on" id="fMic"></button></div>
+          </div>
+          <div class="fh">Extension enforces these automatically</div>
+        </div>
+        <div class="fg"><label class="fl">Notes (optional)</label><input type="text" class="fi" id="fNotes" placeholder="e.g. Sprint planning"></div>
+        <div class="fa">
+          <button type="button" class="btn btn-g" data-close="moAdd">Cancel</button>
+          <button type="submit" class="btn btn-p" id="moBtn"><svg width="12" height="12"><use href="#i-plus"/></svg><span>Schedule</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="mo cf" id="moCf">
+    <div class="md">
+      <div class="cf-ic"><svg><use href="#i-warn"/></svg></div>
+      <div class="cf-t" id="cfT">Delete?</div>
+      <p class="cf-p" id="cfP">This cannot be undone.</p>
+      <div class="cf-acts">
+        <button class="btn btn-g" data-close="moCf">Cancel</button>
+        <button class="btn btn-d" id="cfB">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tc" id="toasts"></div>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "MeetAuto",
+  "version": "1.0",
+  "description": "Schedule Google Meet links to auto-join silently — no camera, no microphone",
+  "permissions": ["alarms", "storage", "notifications"],
+  "host_permissions": ["https://meet.google.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "MeetAuto"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [{
+    "matches": ["https://meet.google.com/*"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }]
+}
