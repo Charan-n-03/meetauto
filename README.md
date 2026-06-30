@@ -22,12 +22,12 @@ MeetAuto is a Chrome extension that automates joining Google Meet calls silently
 - `meetauto_deep_dive.md` - Design notes and technical deep dive documentation
 
 ## Installation
-
-1. Open Chrome and go to `chrome://extensions`
-2. Enable `Developer mode`
-3. Click `Load unpacked`
-4. Select the `MeetAuto` project folder
-5. The extension should appear as `MeetAuto`
+1. Run `git clone https://github.com/Charan-n-03/meetauto.git` or Download zip file of meetauto.  
+2. Open Chrome and go to `chrome://extensions`
+3. Enable `Developer mode`
+4. Click `Load unpacked`
+5. Select the `MeetAuto` project folder
+6. The extension should appear as `MeetAuto`
 
 ## Usage
 
