@@ -1,5 +1,5 @@
 # MeetAuto
-[![Vibe Coded](https://shields.io)](https://img.shields.io/badge/vibe-coded-red)
+<img src= "https://img.shields.io/badge/vibe-coded-red">
 MeetAuto is a Chrome extension that automates joining Google Meet calls silently. It schedules Meet links, opens them at the right time, disables camera and microphone, and clicks the join button automatically.
 
 ## Features
